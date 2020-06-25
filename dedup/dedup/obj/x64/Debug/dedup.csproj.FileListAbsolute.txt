@@ -1,0 +1,2 @@
+C:\Users\John\Documents\GitHub\one-dollar-dedup\dedup\dedup\obj\x64\Debug\dedup.csprojAssemblyReference.cache
+C:\Users\John\Documents\GitHub\one-dollar-dedup\dedup\dedup\obj\x64\Debug\dedup.csproj.CoreCompileInputs.cache
