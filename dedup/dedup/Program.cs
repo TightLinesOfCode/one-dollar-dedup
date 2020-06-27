@@ -23,10 +23,7 @@ namespace dedup
 
     class Program
     {
-        // Local Database Credentials
-        public static string SQLDatabaseUserName = "postgres";
-        public static string SQLDatabasePassword = "n0n3n0n3";
-        public static string SQLDatabaseName = "dedup";
+        
 
         static void Main(string[] args)
         {
@@ -51,7 +48,10 @@ namespace dedup
             string directoryPath = @"\\?\UNC\169.254.7.147\TempFiles\Backups";
 
             // Main processing function
-            ProcessDirectory(new System.IO.DirectoryInfo(directoryPath));
+            //MapDirectory(new System.IO.DirectoryInfo(directoryPath));
+
+            // Process the dedup operations on the database
+            DedupAlgorithm.ProcessDedup();
 
             // Program execution time
             watch.Stop();
@@ -69,7 +69,7 @@ namespace dedup
 
         // Process all files in the directory passed in, recurse on any directories
         // that are found, and process the files they contain.
-        public static void ProcessDirectory(System.IO.DirectoryInfo root)
+        public static void MapDirectory(System.IO.DirectoryInfo root)
         {
             System.IO.FileInfo[] files = null;
             System.IO.DirectoryInfo[] subDirs = null;
@@ -127,11 +127,11 @@ namespace dedup
                     // Check for apostrophe and rename directory then                     
                     if (!ContainsInvalidChacterName(dirInfo.ToString()))
                     {
-                        ProcessDirectory(dirInfo);
+                        MapDirectory(dirInfo);
                     }
                     else 
                     {
-                        ProcessDirectory(FixDirectoryName(dirInfo));
+                        MapDirectory(FixDirectoryName(dirInfo));
                     }
                 }
             }
@@ -164,7 +164,7 @@ namespace dedup
 
 
                 string fileName = Path.GetFileName(filePath);
-                long fileLength = new System.IO.FileInfo(filePath).Length;
+                Int64 fileLength = Convert.ToInt64(new System.IO.FileInfo(filePath).Length);
                 string fullPath = Path.GetDirectoryName(filePath);
                 string hash = null;
 
@@ -184,23 +184,7 @@ namespace dedup
             return;
         }
 
-        public static string CheckMD5(string filename)
-        {           
-                using (var md5 = MD5.Create())
-                {
-                    using (var stream = File.OpenRead(filename))
-                    {
-                        // Generate hash value(Byte Array) for input data
-                        var hashBytes = md5.ComputeHash(stream);
-
-                        // Convert hash byte array to string
-                        var hash = BitConverter.ToString(hashBytes).Replace("-", string.Empty);
-
-                        //return Encoding.Default.GetString(md5.ComputeHash(stream));
-                        return hash;
-                    }
-                }
-        }
+        
 
         private static void InsertFileDataIntoDatabase(string fileName, long filesize, string directorypath, string hash)
         {
@@ -209,7 +193,7 @@ namespace dedup
             try 
             { 
             // Sets up database connection
-            var cs = "Host=localhost;Username=" + SQLDatabaseUserName + ";Password=" + SQLDatabasePassword + ";Database=" + SQLDatabaseName + ";";
+            var cs = "Host=localhost;Username=" + Constants.SQLDatabaseUserName + ";Password=" + Constants.SQLDatabasePassword + ";Database=" + Constants.SQLDatabaseName + ";";
             using var con = new NpgsqlConnection(cs);
             con.Open();
 
