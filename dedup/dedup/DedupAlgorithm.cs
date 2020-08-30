@@ -68,7 +68,7 @@ namespace dedup
                         else
                         {
                             // Remove the item from the database
-                            removeDatabaseRecord(dupFileName, dupFileSize, dupDirectoryPath, duphash);
+                            RemoveDatabaseRecord(dupFileName, dupFileSize, dupDirectoryPath, duphash);
                         }
                         // Check to see if hash files match if so, then move the dupfile
                         if(duphash == hash)
@@ -155,7 +155,7 @@ namespace dedup
             }
         }
 
-        public static  void removeDatabaseRecord(string filename, long filesize, string directorypath, string hash)
+        public static  void RemoveDatabaseRecord(string filename, long filesize, string directorypath, string hash)
         {
 
             try
@@ -190,7 +190,7 @@ namespace dedup
 
         }
 
-        public static void DeleteEmptyDirs(string dir)
+        public static void MoveEmptyDirs(string dir)
         {
             if (String.IsNullOrEmpty(dir))
                 throw new ArgumentException(
@@ -201,7 +201,7 @@ namespace dedup
             {
                 foreach (var d in Directory.EnumerateDirectories(dir))
                 {
-                    DeleteEmptyDirs(d);
+                    MoveEmptyDirs(d);
                 }
 
                 var entries = Directory.EnumerateFileSystemEntries(dir);
@@ -212,6 +212,7 @@ namespace dedup
                     {
                         //Directory.Delete(dir);
                         Directory.Move(dir, @"\\?\UNC\169.254.7.147\TempFiles\EmptyDirectories\" + dir.Remove(0, 22) + "\\");
+                        Log.Information("Just moved {0}", dir);
                     }
                     catch (UnauthorizedAccessException) { }
                     catch (DirectoryNotFoundException) { }

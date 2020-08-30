@@ -51,7 +51,8 @@ namespace dedup
             //MapDirectory(new System.IO.DirectoryInfo(directoryPath));
 
             // Process the dedup operations on the database
-            DedupAlgorithm.ProcessDedup();
+            //DedupAlgorithm.ProcessDedup();
+            DedupAlgorithm.MoveEmptyDirs(directoryPath);
 
             // Program execution time
             watch.Stop();
